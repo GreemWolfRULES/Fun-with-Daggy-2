@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fun with Daggy 2</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        <div id="ui">
+            <div id="timerDisplay">Time: 5:00</div>
+            <div id="creditsDisplay">Credits: 0</div>
+            <div id="healthDisplay">Health: 100%</div>
+        </div>
+        <div id="shop">
+            <h2>SHOP</h2>
+            <button class="shopBtn" data-item="portal">Portal (150)</button>
+            <button class="shopBtn" data-item="barricade">Barricade (50)</button>
+            <button class="shopBtn" data-item="laser">Laser Tower (250)</button>
+            <button class="shopBtn" data-item="slingshot">Slingshot (100)</button>
+            <button class="shopBtn" data-item="cactus">Dancing Cactus (10)</button>
+        </div>
+        <div id="gameOverScreen" class="hidden">
+            <h1 id="gameOverText">GAME OVER</h1>
+            <p id="gameOverMsg"></p>
+            <button onclick="location.reload()">Play Again</button>
+        </div>
+        <div id="introScreen">
+            <div id="daggyFace"></div>
+            <p id="daggyText">Yes... I'm back</p>
+            <button onclick="startGame()">Start Game</button>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>
