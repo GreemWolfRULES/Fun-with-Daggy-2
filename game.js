@@ -30,12 +30,13 @@ const X = {
 const daggy = {
     x: 100,
     y: 100,
-    width: 80,
-    height: 100,
+    width: 100,
+    height: 120,
     speed: 2,
     health: 100,
     targetX: X.x,
-    targetY: X.y
+    targetY: X.y,
+    animationFrame: 0
 };
 
 // Weapon - flip flop
@@ -147,56 +148,102 @@ function startGame() {
     X.health = 100;
     daggy.x = 100;
     daggy.y = 100;
+    daggy.animationFrame = 0;
     gameLoop();
 }
 
 function drawDaggy() {
-    // Daggy body - wider/more scaled
+    const x = daggy.x;
+    const y = daggy.y;
+    
+    // Neon red glow effect
+    ctx.shadowColor = '#ff0000';
+    ctx.shadowBlur = 20;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+    
+    // Main body - chunky robot dog
     ctx.fillStyle = '#ff0000';
-    ctx.fillRect(daggy.x - 40, daggy.y, 80, 70);
+    ctx.fillRect(x - 35, y - 10, 70, 60);
     
-    // Legs
-    ctx.fillRect(daggy.x - 35, daggy.y + 70, 20, 30);
-    ctx.fillRect(daggy.x + 15, daggy.y + 70, 20, 30);
+    // Head - squared off
+    ctx.fillRect(x - 40, y - 50, 80, 45);
     
-    // Broken leg visual
-    ctx.strokeStyle = '#ffaa00';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(daggy.x + 15, daggy.y + 70);
-    ctx.lineTo(daggy.x + 20, daggy.y + 100);
-    ctx.stroke();
+    // Left ear
+    ctx.fillRect(x - 50, y - 60, 20, 20);
     
-    // Head
-    ctx.fillRect(daggy.x - 35, daggy.y - 30, 70, 30);
+    // Right ear
+    ctx.fillRect(x + 30, y - 60, 20, 20);
     
-    // Trapezoid eyes (upside down)
-    ctx.fillStyle = '#000';
-    ctx.beginPath();
-    ctx.moveTo(daggy.x - 20, daggy.y - 20);
-    ctx.lineTo(daggy.x - 10, daggy.y - 15);
-    ctx.lineTo(daggy.x - 10, daggy.y - 5);
-    ctx.lineTo(daggy.x - 20, daggy.y - 10);
-    ctx.fill();
+    // Left front leg
+    ctx.fillRect(x - 45, y + 50, 20, 35);
     
-    ctx.beginPath();
-    ctx.moveTo(daggy.x + 20, daggy.y - 20);
-    ctx.lineTo(daggy.x + 10, daggy.y - 15);
-    ctx.lineTo(daggy.x + 10, daggy.y - 5);
-    ctx.lineTo(daggy.x + 20, daggy.y - 10);
-    ctx.fill();
+    // Right front leg
+    ctx.fillRect(x + 25, y + 50, 20, 35);
     
-    // Visible wires
+    // Back left leg
+    ctx.fillRect(x - 35, y + 50, 15, 30);
+    
+    // Back right leg (broken - angled)
+    ctx.save();
+    ctx.translate(x + 15, y + 50);
+    ctx.rotate(0.3);
+    ctx.fillRect(0, 0, 15, 30);
+    ctx.restore();
+    
+    // Tail
+    ctx.fillRect(x + 40, y + 10, 15, 40);
+    
+    // Reset shadow for details
+    ctx.shadowColor = 'transparent';
+    
+    // SQUARE ANGRY EYES - pixel style
+    ctx.fillStyle = '#000000';
+    
+    // Left eye (larger square)
+    ctx.fillRect(x - 25, y - 35, 12, 12);
+    // Left eye white/glow
+    ctx.fillStyle = '#ff6600';
+    ctx.fillRect(x - 24, y - 34, 10, 10);
+    
+    // Right eye (larger square)
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(x + 13, y - 35, 12, 12);
+    // Right eye white/glow
+    ctx.fillStyle = '#ff6600';
+    ctx.fillRect(x + 14, y - 34, 10, 10);
+    
+    // TEETH - angry mouth
+    ctx.fillStyle = '#ffffff';
+    // Mouth background
+    ctx.fillRect(x - 15, y - 15, 30, 10);
+    
+    // Teeth (little squares)
+    ctx.fillStyle = '#000000';
+    for(let i = 0; i < 5; i++) {
+        ctx.fillRect(x - 12 + (i * 6), y - 13, 5, 6);
+    }
+    
+    // WIRES sticking out
     ctx.strokeStyle = '#ffff00';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 3;
+    
+    // Left wire
     ctx.beginPath();
-    ctx.moveTo(daggy.x - 40, daggy.y + 20);
-    ctx.lineTo(daggy.x - 50, daggy.y + 10);
+    ctx.moveTo(x - 45, y - 10);
+    ctx.lineTo(x - 60, y - 25);
     ctx.stroke();
     
+    // Right wire
     ctx.beginPath();
-    ctx.moveTo(daggy.x + 40, daggy.y + 20);
-    ctx.lineTo(daggy.x + 50, daggy.y + 10);
+    ctx.moveTo(x + 45, y - 10);
+    ctx.lineTo(x + 60, y - 25);
+    ctx.stroke();
+    
+    // Center chest wire
+    ctx.beginPath();
+    ctx.moveTo(x, y + 10);
+    ctx.lineTo(x, y + 30);
     ctx.stroke();
 }
 
@@ -208,11 +255,14 @@ function drawX() {
     ctx.fillText('X', X.x, X.y);
     
     // Glow effect
+    ctx.shadowColor = '#00ff00';
+    ctx.shadowBlur = 15;
     ctx.strokeStyle = '#00ff00';
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.arc(X.x, X.y, X.size + 10, 0, Math.PI * 2);
     ctx.stroke();
+    ctx.shadowColor = 'transparent';
 }
 
 function updateDaggyAI() {
@@ -226,13 +276,15 @@ function updateDaggyAI() {
         daggy.y += (dy / distance) * daggy.speed;
     }
     
+    daggy.animationFrame++;
+    
     // Check collisions with defenses
     for(let defense of game.defenses) {
         const ddx = defense.x - daggy.x;
         const ddy = defense.y - daggy.y;
         const ddist = Math.sqrt(ddx * ddx + ddy * ddy);
         
-        if(ddist < (defense.width/2 + 40)) {
+        if(ddist < (defense.width/2 + 50)) {
             switch(defense.type) {
                 case 'portal':
                     if(!defense.linkedPortal) {
@@ -329,9 +381,6 @@ function jumpscare() {
     setTimeout(() => {
         canvas.style.filter = 'brightness(1) contrast(1)';
     }, 200);
-    
-    const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj==');
-    audio.play().catch(() => {});
 }
 
 canvas.addEventListener('click', (e) => {
@@ -380,9 +429,25 @@ document.querySelectorAll('.shopBtn').forEach(btn => {
 });
 
 function gameLoop() {
-    // Clear canvas
+    // Clear canvas with dark background
     ctx.fillStyle = '#0a0000';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw grid/pattern background
+    ctx.strokeStyle = 'rgba(255, 0, 0, 0.05)';
+    ctx.lineWidth = 1;
+    for(let i = 0; i < canvas.width; i += 50) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, canvas.height);
+        ctx.stroke();
+    }
+    for(let i = 0; i < canvas.height; i += 50) {
+        ctx.beginPath();
+        ctx.moveTo(0, i);
+        ctx.lineTo(canvas.width, i);
+        ctx.stroke();
+    }
     
     if(gameRunning) {
         updateDaggyAI();
@@ -393,7 +458,7 @@ function gameLoop() {
         const dy = X.y - daggy.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
         
-        if(distance < 50) {
+        if(distance < 60) {
             jumpscare();
             endGame(false);
         }
